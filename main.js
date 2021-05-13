@@ -1,9 +1,8 @@
 
 const express = require('express');
-const ethers = require('ethers');
 const { fmarsStats } = require('./token');
 const app = express();
-
+const PORT = 8000;
 
 
 const toCamelCase = (key) => {
@@ -25,9 +24,16 @@ const toCamelCase = (key) => {
 app.get('/:key', async (req, res) => {
     try {
         const stats = await fmarsStats();
-        console.log(toCamelCase(req.params.key));
+        const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+	if (req.params.key != 'favicon.ico') {
+            console.log(`[${new Date()}] ${ip}: ${toCamelCase(req.params.key)}`);
+	}
         const value = stats[toCamelCase(req.params.key)];
-        res.send(`${value}`);   
+        if (typeof value === 'undefined') {
+	   throw new Exception("");
+	}
+	res.send(`${value}`);
     }
     catch (e) {
         res.status(500).send('SERVER ERROR');
@@ -36,7 +42,7 @@ app.get('/:key', async (req, res) => {
 });
 
 
-app.listen(80, () => {
-    console.group(`listening on port 80..`);
+app.listen(PORT, () => {
+    console.group(`listening on port ${PORT}..`);
 });
 

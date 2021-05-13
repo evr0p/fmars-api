@@ -1,0 +1,13 @@
+[Unit]
+Description=Serves token info via API
+After=network.target
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=3
+User=bitnami
+ExecStart=/usr/bin/env node /home/bitnami/fmars-api/main.js
+
+[Install]
+WantedBy=multi-user.target
